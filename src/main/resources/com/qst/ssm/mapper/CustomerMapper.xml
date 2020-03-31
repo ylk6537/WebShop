@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qst.ssm.mapper.CustomerMapper">
+
+    <select id="findAll" resultType="com.qst.ssm.entity.Customer">
+         <![CDATA[
+        SELECT
+            id as id,
+            email as email,
+            name as  nanme,
+            username as username,
+            PASSWORD as password,
+            phoneNum as phoneNum
+        FROM
+            customer
+	]]>
+    </select>
+
+    <select id="findById" resultType="com.qst.ssm.entity.Customer">
+         <![CDATA[
+        SELECT
+            id as id,
+            email as email,
+            name as  nanme,
+            username as username,
+            PASSWORD as password,
+            phoneNum as phoneNum
+        FROM
+            customer
+        where id=#{id}
+	]]>
+    </select>
+
+    <select id="findByKeyWord" resultType="com.qst.ssm.entity.Customer" parameterType="string">
+         <![CDATA[
+          SELECT
+            id as id,
+            email as email,
+            name as  nanme,
+            username as username,
+            PASSWORD as password,
+            phoneNum as phoneNum
+        FROM
+            customer
+        where   email like concat(concat('%',#{email},'%')) or
+                username like concat(concat('%',#{username},'%')) or
+                phoneNum like concat(concat('%',#{phoneNum},'%'))
+	]]>
+    </select>
+
+
+    <update id="update"  parameterType="com.qst.ssm.entity.Customer" >
+        <![CDATA[
+            update customer
+            set
+                    PASSWORD = md5(123456)
+
+            WHERE id= #{id}
+        ]]>
+    </update>
+
+    <update id="updateInfo"  parameterType="com.qst.ssm.entity.Customer" >
+        <![CDATA[
+            update customer
+            set
+                    PASSWORD =md5(123456)
+
+            WHERE id= #{id}
+        ]]>
+    </update>
+
+    <delete id="delete" parameterType="int">
+        <![CDATA[
+               delete from customer
+               where id=#{id}
+        ]]>
+
+    </delete>
+
+    <!--查询密码进行登录验证-->
+    <select id="findCustomer" parameterType="String" resultType="customer">
+        select id,email,username,password,phoneNum,sex,peopleID,name
+        from customer
+        where username=#{username}
+        and password=md5(#{password})
+    </select>
+
+<!--修改密码-->
+    <update id="changePW" parameterType="String" >
+        update customer set password=md5(#{newPassword})
+        where
+        username=#{username}
+        and
+        password=md5(#{oldPassword})
+    </update>
+
+    <!--完善个人信息-->
+
+    <update id="updateCustomer" parameterType="Customer">
+        update customer
+        set
+        name=#{name},
+        email=#{email},
+        phoneNum=#{phoneNum},
+        sex=#{sex},
+        peopleID=#{peopleID}
+        where username=#{username}
+        and password=md5(#{password})
+    </update>
+    <!--修改个人信息-->
+    <update id="updateCustomer2" parameterType="Customer">
+        update customer
+        set
+        username=#{username},
+        email=#{email},
+        phoneNum=#{phoneNum}
+        where id=#{id}
+    </update>
+
+
+<!--注册-->
+    <insert id="addCustomer" parameterType="String">
+        INSERT INTO customer (username, password )
+VALUES
+	(#{username},md5(#{password}))
+    </insert>
+
+
+    <select id="getOrdersCustomer" resultType="Customer" parameterType="int">
+        <![CDATA[
+        select
+            cj.id,
+	        name,
+	        email,
+	        username,
+	        password,
+	        sex,
+	        phoneNum,
+	        peopleID
+        from
+	        customer as cj
+	    inner join orders as o on cj.id=o.travellerId
+	    where o.id=#{id}
+
+        ]]>
+    </select>
+
+</mapper>

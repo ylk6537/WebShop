@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qst.ssm.mapper.OrdersMapper">
+    <!--查询所有订单信息-->
+    <select id="queryOrders" resultType="orders">
+         <![CDATA[
+        select
+	       id as id,
+	       orderNum as orderNum,
+	       orderTime as orderTime,
+	       orderDesc as orderDesc,
+	       payType as payType,
+	       orderStatus as orderStatus,
+	       productId as productId,
+	       memberId as memberId
+        from
+	      orders
+	]]>
+    </select>
+
+    <select id="CusQueryOrders" resultType="map" parameterType="int">
+         <![CDATA[
+        select
+	       o.id as id,
+	       o.orderNum as orderNum,
+	       o.orderTime as orderTime,
+	       o.orderDesc as orderDesc,
+	       o.payType as payType,
+	       o.orderStatus as orderStatus,
+	       o.productId as productId,
+	       o.memberId as memberId,
+	       o.travellerId as travellerId,
+	       p.productName as productName,
+	       p.productPrice as productPrice
+        from
+	      orders as o
+	      INNER JOIN
+            product as p ON o.productId = p.id
+	      where o.travellerId = #{Id}
+	]]>
+    </select>
+    <!--根据Id查询订单信息-->
+    <select id="getOrders" resultType="com.qst.ssm.entity.Orders" parameterType="int">
+         <![CDATA[
+        select
+	       id as id,
+	       orderNum as orderNum,
+	       orderTime as orderTime,
+	       orderDesc as orderDesc,
+	       payType as payType,
+	       orderStatus as orderStatus,
+	       productId as productId,
+	       memberId as memberId
+        from
+	      orders
+	    where id=#{value}
+	]]>
+    </select>
+    <!--添加订单信息-->
+    <insert id="insertOrders" parameterType="Orders">
+        <![CDATA[
+        insert into orders (
+	          orderNum,
+	          orderTime,
+	          orderDesc,
+	          orderStatus,
+	          productId,
+	          memberId,
+	          travellerId
+              )
+        values(#{orderNum},now(),#{orderDesc},0,#{productId},#{memberId},#{travellerId});
+        ]]>
+    </insert>
+    <!--修改订单信息-->
+    <update id="updateOrders" parameterType="Orders">
+
+    update orders set orderNum=#{orderNum},orderDesc=#{orderDesc} where id=#{id}
+    </update>
+
+    <!--根据Id删除订单信息-->
+    <delete id="deleteOrders" parameterType="Orders">
+    delete from orders where id=#{id}
+    </delete>
+
+    <!--查询订单-产品信息-->
+    <select id="queryOrdersProduct" resultType="map" parameterType="map">
+        select
+            o.id,
+	        o.orderNum,
+	        p.productName,
+	        p.productPrice,
+	        o.orderTime,
+	        o.orderStatus
+        from
+	        orders as o
+        INNER JOIN
+            product as p ON o.productId = p.id
+
+    </select>
+
+    <!--查询订单-产品信息模糊查询-->
+    <select id="OPFallAllLike" resultType="map" parameterType="map">
+    <![CDATA[
+        select
+            o.id,
+	        orderNum,
+	        productName,
+	        productPrice,
+	        orderTime,
+	        orderStatus
+        from
+	        orders as o
+        INNER JOIN
+            product as p ON o.productId = p.id
+        where
+        productName like concat(concat('%',#{value},'%'))
+]]>
+
+    </select>
+    <!--查询订单-产品信息-->
+    <select id="getOrdersProduct" resultType="map" parameterType="int">
+         <![CDATA[
+       select
+	       o.id,
+	       orderNum,
+	       orderTime,
+	       orderDesc,
+	       payType,
+	       orderStatus,
+	       productId,
+	       memberId,
+	       p.id,
+	       productNum,
+	       productName,
+	       cityName,
+	       departureTime,
+         productPrice,
+         productDesc,
+         productStatus
+       from
+	       orders as  o
+       inner join  product as  p on o.productId = p.id
+       and o.id =#{id}
+	]]>
+    </select>
+
+    <!--修改支付状态信息-->
+    <update id="updateOrdersStatus" parameterType="Orders">
+
+     update orders
+     set orderStatus=1
+     where id = #{id}
+
+    </update>
+
+    <select id="orderInfo" resultType="map" parameterType="string">
+         <![CDATA[
+        SELECT
+                b.id,
+                a.productNum,
+                a.productName,
+                a.cityName,
+                a.departureTime,
+                a.productPrice,
+                a.productDesc,
+                a.productStatus,
+                b.orderNum,
+                b.orderTime,
+                b.orderDesc,
+                b.payType,
+                b.orderStatus,
+                b.productId,
+                b.memberId,
+                b.travellerId,
+                c.hyname,
+                c.nickname,
+                c.phoneNum,
+                c.email,
+                d.`name`,
+                d.email,
+                d.username,
+                d.sex,
+                d.phoneNum,
+                d.peopleID
+                FROM
+                product a,
+                orders b,
+                member c,
+                customer d
+                WHERE
+                b.travellerId = d.id
+                AND b.memberId = c.id
+                AND b.productId = a.id
+                AND b.orderNum = #{orderNum}
+	]]>
+    </select>
+
+
+
+
+
+</mapper>
